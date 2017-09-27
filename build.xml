@@ -1,0 +1,75 @@
+<project name="Lab02-ComputePi" basedir="." default="compile">
+
+    <presetdef name="javac">
+        <javac includeantruntime="false"/>
+    </presetdef>
+
+    <property name="src.dir"            value="src"/>
+    <property name="build.dir"          value="build"/>
+    <property name="security.dir"       value="security"/>
+    <property name="client.src.dir"     value="${src.dir}/client"/>
+    <property name="compute.src.dir"    value="${src.dir}/compute"/>
+    <property name="engine.src.dir"     value="${src.dir}/engine"/>
+
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="interface">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${compute.src.dir}" destdir="${build.dir}" debug="true"/>
+        <jar   destfile="${build.dir}/compute.jar" basedir="${build.dir}/compute"/>
+            <manifest file="MANIFEST.MF">
+                <attribute name="Main-Class" value="compute.Compute"/>
+            </manifest>
+    </target>
+
+    <target name="server">
+        <javac classpath="${build.dir}/compute/compute.jar"
+               srcdir="${engine.src.dir}"
+               destdir="${build.dir}"
+               debug="true"/>
+    </target>
+
+    <target name="client">
+        <javac classpath="${build.dir}/compute/compute.jar"
+               srcdir="${client.src.dir}"
+               destdir="${build.dir}"
+               debug="true"/>
+    </target>
+
+    <target name="start-reg">
+        <exec executable="rmiregistry" spawn="true">
+            <arg value="-J-Djava.class.path=${build.dir}/"/>
+            <arg value="-J-Djava.net.preferIPv4Stack=true"/>
+            <!--<arg value="-J-Djava.rmi.server.hostname=mindonly"/>-->
+            <!--<arg value="-J-Djava.rmi.server.hostname=148.61.186.161"/>-->
+            <!--<arg value="-J-Djava.rmi.server.useCodebaseOnly=false"/>-->
+        </exec>
+        <sleep seconds="2"/>
+    </target>
+
+    <target name="stop-reg">
+        <exec executable="killall">
+            <arg value="rmiregistry"/>
+        </exec>
+        <sleep seconds="2"/>
+    </target>
+
+    <target name="start-server">
+        <java classpath="${build.dir}/" classname="engine.ComputeEngine">
+            <!--<arg value="-Djava.rmi.server.codebase=file:./build/compute.jar"/>-->
+            <!--<arg value="-Djava.rmi.server.useCodebaseOnly=false"/>-->
+            <!--<arg value="-Djava.rmi.server.hostname=148.61.186.161"/>-->
+            <arg value="-Djava.rmi.server.hostname=mindonly"/>
+            <arg value="-Djava.security.policy=server.policy"/>
+        </java>
+    </target>
+
+    <target name="compile" depends="interface, server, client"/>
+    <target name="start" depends="start-reg, start-server"/>
+    <target name="stop" depends="stop-reg"/>
+    <target name="restart" depends="stop, start"/>
+
+</project>
