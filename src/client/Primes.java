@@ -65,8 +65,8 @@ public class Primes implements Task<ArrayList>, Serializable {
     public static ArrayList findPrimes(int min, int max) {
 
         // initially assume all integers are prime
-        // 0 and 1 are not prime
-        boolean[]isPrime = new boolean[max+1];
+        // 0 and 1 are not
+        boolean[] isPrime = new boolean[max+1];
         for (int i = 2; i <= max; i++) {
             isPrime[i] = true;
         }
@@ -96,8 +96,6 @@ public class Primes implements Task<ArrayList>, Serializable {
             if (item != 0 && item >= min)
                 pal.add(item);
         }
-
-        System.out.println(pal.toString());
 
         return pal;
     }
