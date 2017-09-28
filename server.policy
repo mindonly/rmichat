@@ -1,3 +1,3 @@
-grant codeBase "file:/home/sanch/Dropbox/F2017/cis656/Lab02/build/engine/" {
+grant {
     permission java.security.AllPermission;
 };
