@@ -59,7 +59,7 @@
 
     <target name="start-server">
         <java classpath="${build.dir}/" classname="engine.ComputeEngine">
-            <!--<arg value="-Djava.rmi.server.codebase=file:./build/compute.jar"/>-->
+            <arg value="-Djava.rmi.server.codebase=file:./build/compute.jar"/>
             <!--<arg value="-Djava.rmi.server.useCodebaseOnly=false"/>-->
             <!--<arg value="-Djava.rmi.server.hostname=148.61.186.161"/>-->
             <arg value="-Djava.rmi.server.hostname=mindonly"/>
