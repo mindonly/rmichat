@@ -26,7 +26,7 @@ public class ChatListener implements Runnable {
             while (true) {
                 try {
                     Socket socket = server.accept();
-                    Thread client = new Thread(new ProcessIncomingRequest(socket, this.client));
+                    Thread client = new Thread(new ProcessIncomingRequest(socket));
                     client.start();
                 } catch (IOException e) {
                     e.printStackTrace();

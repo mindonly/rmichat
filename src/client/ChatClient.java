@@ -3,15 +3,13 @@ package client;
 import presence.PresenceService;
 import presence.RegistrationInfo;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.net.InetAddress;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.rmi.registry.LocateRegistry;
+import java.net.InetAddress;
 import java.rmi.registry.Registry;
+import java.rmi.registry.LocateRegistry;
 import java.util.Vector;
 
 public class ChatClient {
@@ -89,6 +87,7 @@ public class ChatClient {
         this.status = mode;
     }
 
+        // join the chat server after presence server lookup
     public void join(int talkPort) {
         try {
             if (pres.lookup(this.userName) == null) {
@@ -107,6 +106,7 @@ public class ChatClient {
         }
     }
 
+        // update availability status on the presence server
     public void updateStatus(boolean mode) {
         RegistrationInfo ri;
         try {
@@ -128,6 +128,7 @@ public class ChatClient {
                 ri.setStatus(mode);
                 this.setStatus(mode);
                 pres.updateRegistrationInfo(ri);
+                System.out.println("ok, " + avail);
             }
         } catch (Exception e) {
             System.err.println("ChatClient.updateStatus() exception:");
@@ -135,6 +136,7 @@ public class ChatClient {
         }
     }
 
+        // exit the chat server
     public void exit() {
         try {
             if (pres.lookup(this.userName) != null)
@@ -146,6 +148,7 @@ public class ChatClient {
         }
     }
 
+        // display user connection details
     public void whoami() {
         System.out.println();
         System.out.println("     userid: " + this.getUserName());
@@ -156,6 +159,7 @@ public class ChatClient {
         System.out.println();
     }
 
+        // display the buddy list
     public void showFriends() {
         try {
             if (pres.listRegisteredUsers() != null) {
@@ -181,6 +185,7 @@ public class ChatClient {
         }
     }
 
+        // find a specific user; return a RegistrationInfo object
     public RegistrationInfo find(String userName) {
         try {
             if (pres.listRegisteredUsers() != null) {
@@ -199,6 +204,63 @@ public class ChatClient {
         return null;
     }
 
+        // send a message to a specific, available user
+    public void talk(String[] cmdtokens) {
+        try {
+            String funame = cmdtokens[1];
+            RegistrationInfo tri = this.find(funame);
+            PrintStream tos;
+            if (tri != null && tri.getUserName().equals(this.getUserName()))
+                ;
+            else if (tri != null && tri.getStatus()) {
+                Socket talkSocket = new Socket(tri.getHost(), tri.getPort());
+                tos = new PrintStream(talkSocket.getOutputStream());
+                tos.print(this.getUserName() + ": ");
+                for (int i = 2; i < cmdtokens.length; i++)
+                    tos.println(cmdtokens[i] + " ");
+            } else System.out.println("talk() error: user " + funame + " busy or not found.");
+        } catch (Exception e) {
+            System.err.println("ChatClient.talk() exception:");
+            e.printStackTrace();
+        }
+    }
+
+        // broadcast a message to all available users
+    public void broadcast(String[] cmdtokens) {
+        try {
+            if (pres.listRegisteredUsers() != null) {
+                Vector<RegistrationInfo> buddyVector = pres.listRegisteredUsers();
+                for (RegistrationInfo bri : buddyVector) {
+                    if (! bri.getUserName().equals(this.getUserName()) && bri.getStatus()) {
+                        Socket bcastSocket = new Socket(bri.getHost(), bri.getPort());
+                        PrintStream bos = new PrintStream(bcastSocket.getOutputStream());
+                        bos.print(this.getUserName() + ": ");
+                        for (int j = 1; j < cmdtokens.length; j++)
+                            bos.println(cmdtokens[j] + " ");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("ChatClient.broadcast() exception:");
+            e.printStackTrace();
+        }
+    }
+
+        // print a help message
+    static void help() {
+        System.out.println("usage:");
+        System.out.println("    help\t\t\tthis message");
+        System.out.println("    friends\t\t\tshow friends");
+        System.out.println("    status\t\t\tcurrent status");
+        System.out.println("    whoami\t\t\tconnection details");
+        System.out.println("    busy\t\t\tupdate status 'busy' ");
+        System.out.println("    available\t\t\tupdate status 'available' ");
+        System.out.println("    broadcast {message}\t\tsend message to all available users");
+        System.out.println("    talk {username} {message}\tsend message to an available user");
+        System.out.println("    exit\t\t\tquit rmichat");
+    }
+
+        // main program
     public static void main(String[] args) {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
@@ -256,71 +318,42 @@ public class ChatClient {
                 }
                 String[] tokens = line.split("\\s+");
                 switch (tokens[0]) {
+                    case "buddies":
                     case "friends":
                         cc.showFriends();
                         break;
                     case "whoami":
+                    case "details":
                         cc.whoami();
                         break;
                     case "talk":
-                        String funame = tokens[1];
-                        RegistrationInfo tri = cc.find(funame);
-                        PrintStream tos;
-                        if (tri != null && tri.getStatus()) {
-                            Socket talkSocket = new Socket(tri.getHost(), tri.getPort());
-                            tos = new PrintStream(talkSocket.getOutputStream());
-                            tos.print(cc.getUserName() + ": ");
-                            for (int i = 2; i < tokens.length; i++)
-                                tos.println(tokens[i] + " ");
-                        } else System.out.println("talk() error: user " + funame + " busy or not found.");
+                    case "yo":
+                        cc.talk(tokens);
                         break;
                     case "broadcast":
-                        try {
-                            if (cc.pres.listRegisteredUsers() != null) {
-                                Vector<RegistrationInfo> buddyVector = cc.pres.listRegisteredUsers();
-                                for (RegistrationInfo bri : buddyVector) {
-                                    if (! bri.getUserName().equals(cc.getUserName()) && bri.getStatus()) {
-                                        Socket bcastSocket = new Socket(bri.getHost(), bri.getPort());
-                                        PrintStream bos = new PrintStream(bcastSocket.getOutputStream());
-                                        bos.print(cc.getUserName() + ": ");
-                                        for (int j = 1; j < tokens.length; j++)
-                                            bos.println(tokens[j] + " ");
-                                    }
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        cc.broadcast(tokens);
                         break;
                     case "status":
-                        if (cc.getStatus())
-                            System.out.println("available");
+                        if (cc.getStatus()) System.out.println("available");
                         else System.out.println("busy");
                         break;
                     case "busy":
                         cc.updateStatus(false);
                         break;
                     case "available":
+                    case "avail":
                         cc.updateStatus(true);
                         break;
                     case "help":
-                        System.out.println("usage:");
-                        System.out.println("    help\t\t\tthis message");
-                        System.out.println("    friends\t\t\tshow friends");
-                        System.out.println("    status\t\t\tcurrent status");
-                        System.out.println("    whoami\t\t\tconnection details");
-                        System.out.println("    busy\t\t\tupdate status 'busy' ");
-                        System.out.println("    available\t\t\tupdate status 'available' ");
-                        System.out.println("    broadcast {message}\t\tsend message to all available users");
-                        System.out.println("    talk {username} {message}\tsend message to an available user");
-                        System.out.println("    exit\t\t\tquit rmichat");
+                        help();
                         break;
                     case "exit":
+                    case "quit":
                         cc.exit();
                         System.exit(0);
                         break;
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
