@@ -105,10 +105,6 @@
         </exec>
     </target>
 
-    <target name="chatclient">
-
-    </target>
-
     <target name="compile" depends="interface, server, client"/>
     <target name="start" depends="start-web, start-reg, start-server"/>
     <target name="stop" depends="stop-reg, stop-web"/>
