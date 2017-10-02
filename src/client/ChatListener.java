@@ -1,8 +1,7 @@
 package client;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.ServerSocket;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ChatListener implements Runnable {
@@ -28,7 +27,7 @@ public class ChatListener implements Runnable {
                     Socket socket = server.accept();
                     Thread client = new Thread(new ProcessIncomingRequest(socket));
                     client.start();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

@@ -113,7 +113,7 @@ public class ChatClient {
             if (pres.lookup(this.userName) != null)
                 ri = pres.lookup(this.userName);
             else {
-                System.err.println("updateStatus() failed, ChatClient user " +
+                System.err.println("updateStatus() failed, user " +
                         this.userName + " is not registered.");
                 return;
             }
@@ -123,7 +123,7 @@ public class ChatClient {
             else avail = "busy";
 
             if (ri.getStatus() == mode)
-                System.out.println("updateStatus() failed, ChatClient user " + this.userName + " is already " + avail);
+                System.out.println("updateStatus() failed, user " + this.userName + " is already " + avail);
             else {
                 ri.setStatus(mode);
                 this.setStatus(mode);
