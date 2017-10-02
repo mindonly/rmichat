@@ -1,4 +1,4 @@
-<project name="CIS656-Lab02" basedir="." default="pi">
+<project name="CIS656-Lab02" basedir=".">
 
     <presetdef name="javac">
         <javac includeantruntime="false"/>
@@ -10,6 +10,8 @@
     <property name="client.src.dir"     value="${src.dir}/client"/>
     <property name="compute.src.dir"    value="${src.dir}/compute"/>
     <property name="engine.src.dir"     value="${src.dir}/engine"/>
+    <property name="presence.src.dir"    value="${src.dir}/presence"/>
+    <property name="server.src.dir"    value="${src.dir}/server"/>
 
 
     <target name="clean">
@@ -18,23 +20,43 @@
 
     <target name="interface">
         <mkdir dir="${build.dir}"/>
+        <!--compute interface-->
         <javac srcdir="${compute.src.dir}" destdir="${build.dir}" debug="true"/>
         <jar   destfile="${build.dir}/compute.jar" basedir="${build.dir}/compute">
             <manifest>
                 <attribute name="Main-Class" value="compute.Compute"/>
             </manifest>
         </jar>
+        <!--presence interface-->
+        <javac srcdir="${presence.src.dir}" destdir="${build.dir}" debug="true"/>
+        <jar   destfile="${build.dir}/presence.jar" basedir="${build.dir}/presence">
+            <manifest>
+                <attribute name="Main-Class" value="presence.PresenceService"/>
+            </manifest>
+        </jar>
     </target>
 
     <target name="server">
+        <!--compute server-->
         <javac classpath="${build.dir}/compute.jar"
                srcdir="${engine.src.dir}"
+               destdir="${build.dir}"
+               debug="true"/>
+        <!--presence server-->
+        <javac classpath="${build.dir}/presence.jar"
+               srcdir="${server.src.dir}"
                destdir="${build.dir}"
                debug="true"/>
     </target>
 
     <target name="client">
+        <!--compute client-->
         <javac classpath="${build.dir}/compute.jar"
+               srcdir="${client.src.dir}"
+               destdir="${build.dir}"
+               debug="true"/>
+        <!--chat client-->
+        <javac classpath="${build.dir}/presence.jar"
                srcdir="${client.src.dir}"
                destdir="${build.dir}"
                debug="true"/>
@@ -54,7 +76,7 @@
 
     <target name="start-reg">
         <exec executable="rmiregistry" spawn="true">
-            <arg value="-J-Djava.class.path=${src.dir}:${build.dir}:${build.dir}/compute.jar"/>
+            <arg value="-J-Djava.class.path=${src.dir}:${build.dir}:${build.dir}/compute.jar:${build.dir}/presence.jar"/>
         </exec>
         <sleep seconds="2"/>
     </target>
@@ -67,21 +89,24 @@
     </target>
 
     <target name="start-server">
+        <!--compute server-->
         <exec executable="sh">
-           <arg value="${bin.dir}/startserver.sh"/>
+           <arg value="${bin.dir}/computeserver.sh"/>
+        </exec>
+        <!--presence server-->
+        <exec executable="sh">
+            <arg value="${bin.dir}/presenceserver.sh"/>
         </exec>
     </target>
 
-    <target name="pi">
+    <target name="computeloop">
         <exec executable="sh">
-            <arg value="${bin.dir}/computepi.sh"/>
+            <arg value="${bin.dir}/computeloop.sh"/>
         </exec>
     </target>
 
-    <target name="primes">
-        <exec executable="sh">
-            <arg value="${bin.dir}/findprimes.sh"/>
-        </exec>
+    <target name="chatclient">
+
     </target>
 
     <target name="compile" depends="interface, server, client"/>
