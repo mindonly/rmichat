@@ -20,7 +20,7 @@ public class ChatListener implements Runnable {
         int randomPort = ThreadLocalRandom.current().nextInt(2000, 8000 + 1);
         try {
             ServerSocket server = new ServerSocket(randomPort);
-            System.out.println("server started and listening [" + randomPort + "]");
+            System.out.println("listening [" + randomPort + "]");
             this.listenPort = randomPort;
 
             while (true) {

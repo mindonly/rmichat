@@ -18,11 +18,9 @@ public class ProcessIncomingRequest implements Runnable {
 
     @Override
     public void run() {
-
         String line;
         BufferedReader is;
         PrintStream os;
-
         try {
             is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
@@ -38,6 +36,4 @@ public class ProcessIncomingRequest implements Runnable {
             e.printStackTrace();
         }
     }
-
-
 }

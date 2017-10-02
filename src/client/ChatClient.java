@@ -270,12 +270,9 @@ public class ChatClient {
                             Socket talkSocket = new Socket(tri.getHost(), tri.getPort());
                             tos = new PrintStream(talkSocket.getOutputStream());
                             tos.print(cc.getUserName() + ": ");
-                            for (int i = 2; i < tokens.length; i++) {
+                            for (int i = 2; i < tokens.length; i++)
                                 tos.println(tokens[i] + " ");
-                            }
-                        } else {
-                            System.out.println("talk() error: user " + funame + " busy or not found.");
-                        }
+                        } else System.out.println("talk() error: user " + funame + " busy or not found.");
                         break;
                     case "broadcast":
                         try {
@@ -286,9 +283,8 @@ public class ChatClient {
                                         Socket bcastSocket = new Socket(bri.getHost(), bri.getPort());
                                         PrintStream bos = new PrintStream(bcastSocket.getOutputStream());
                                         bos.print(cc.getUserName() + ": ");
-                                        for (int j = 1; j < tokens.length; j++) {
+                                        for (int j = 1; j < tokens.length; j++)
                                             bos.println(tokens[j] + " ");
-                                        }
                                     }
                                 }
                             }
@@ -311,12 +307,12 @@ public class ChatClient {
                         System.out.println("usage:");
                         System.out.println("    help\t\t\tthis message");
                         System.out.println("    friends\t\t\tshow friends");
-                        System.out.println("    whoami\t\t\tconnection details");
                         System.out.println("    status\t\t\tcurrent status");
+                        System.out.println("    whoami\t\t\tconnection details");
                         System.out.println("    busy\t\t\tupdate status 'busy' ");
                         System.out.println("    available\t\t\tupdate status 'available' ");
-                        System.out.println("    broadcast {message}\t\tsend message to all users");
-                        System.out.println("    talk {username} {message}\tsend message to a user");
+                        System.out.println("    broadcast {message}\t\tsend message to all available users");
+                        System.out.println("    talk {username} {message}\tsend message to an available user");
                         System.out.println("    exit\t\t\tquit rmichat");
                         break;
                     case "exit":
@@ -324,8 +320,6 @@ public class ChatClient {
                         System.exit(0);
                         break;
                 }
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
