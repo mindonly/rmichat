@@ -82,12 +82,12 @@ public class Primes implements Task<ArrayList>, Serializable {
         }
 
         int[] primes = new int[max];
-        int primeCount = 0;
+        int primeIdx = 0;
 
         for (int i = 0; i <= max; i++) {
             if (isPrime[i]) {
-                primes[primeCount] = i;
-                primeCount++;
+                primes[primeIdx] = i;
+                primeIdx++;
             }
         }
 
@@ -96,6 +96,8 @@ public class Primes implements Task<ArrayList>, Serializable {
             if (item != 0 && item >= min)
                 pal.add(item);
         }
+
+//        System.out.println(primeIdx + " primes found.\n");
 
         return pal;
     }
