@@ -16,6 +16,7 @@ public class ChatListener implements Runnable {
 
     @Override
     public void run() {
+            // generate a random number for the listening port
         int randomPort = ThreadLocalRandom.current().nextInt(2000, 8000 + 1);
         try {
             ServerSocket server = new ServerSocket(randomPort);

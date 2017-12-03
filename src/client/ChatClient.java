@@ -1,3 +1,8 @@
+/*
+ * Lab 02
+ * Rob Sanchez
+ * CIS 656, F2017
+ */
 package client;
 
 import presence.PresenceService;
@@ -260,6 +265,11 @@ public class ChatClient {
         System.out.println("    exit\t\t\tquit rmichat");
     }
 
+        // advance client prompt
+    public void advancePrompt() {
+        System.out.println();
+    }
+
         // main program
     public static void main(String[] args) {
         if (System.getSecurityManager() == null) {
@@ -291,10 +301,12 @@ public class ChatClient {
                 break;
         }
 
+            // create and kick off Chat Listener in a new thread
         ChatListener cl = new ChatListener(cc);
         Thread t = new Thread(cl);
         t.start();
 
+            // without a brief sleep, join() below fails to retrieve the listen port
         try {
             Thread.currentThread().sleep(50);
         } catch (InterruptedException e) {
@@ -309,6 +321,7 @@ public class ChatClient {
         BufferedReader is;
         is = new BufferedReader(new InputStreamReader(System.in));
 
+            // process commands at the rmichat prompt
         while(true) {
             try {
                 System.out.print("rmichat> ");

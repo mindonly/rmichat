@@ -30,7 +30,11 @@
  */ 
 
 package client;
-
+/*
+ * Lab 02
+ * Rob Sanchez
+ * CIS 656, F2017
+ */
 import compute.Compute;
 import java.math.BigDecimal;
 import java.util.Scanner;

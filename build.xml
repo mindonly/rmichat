@@ -1,3 +1,9 @@
+
+<!--Lab 02-->
+<!--Rob Sanchez-->
+<!--CIS656, F2017-->
+<!--Engelsma-->
+
 <project name="CIS656-Lab02" basedir=".">
 
     <presetdef name="javac">

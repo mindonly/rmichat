@@ -13,6 +13,7 @@ public class ProcessIncomingRequest implements Runnable {
         this.clientSocket = clientSocket;
     }
 
+
     @Override
     public void run() {
         String line;
@@ -21,12 +22,8 @@ public class ProcessIncomingRequest implements Runnable {
         try {
             is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 //            os = new PrintStream(clientSocket.getOutputStream());
-            while(true) {
-                line = is.readLine();
-                if(line == null) {
-                    break;
-                }
-                System.out.print(line);
+            while ( (line = is.readLine()) != null) {
+                    System.out.print(line);
             }
         } catch (Exception e) {
             System.err.println("ProcessIncomingRequest exception:");
